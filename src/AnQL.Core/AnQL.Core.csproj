@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Antlr4.Runtime.Standard" Version="4.11.1" />
+      <PackageReference Include="Antlr4BuildTasks" Version="11.3.0" PrivateAssets="all" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Antlr4 Include="Grammar/AnQLGrammar.g4">
+            <Listener>false</Listener>
+            <Visitor>true</Visitor>
+            <Package>AnQL.Core</Package>
+            <Error>true</Error>
+            <DOptions>language=CSharp</DOptions>
+        </Antlr4>
+    </ItemGroup>
+
+</Project>
