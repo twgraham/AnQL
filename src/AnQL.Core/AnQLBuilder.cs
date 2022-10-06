@@ -13,8 +13,8 @@ public class AnQLBuilder
         _options = options;
     }
 
-    public TBuilder For<TBuilder, TValue>(Func<AnQLParserOptions, TBuilder> creator)
-        where TBuilder : IAnQLParserBuilder<TValue>
+    public TBuilder For<TBuilder, TReturn, TItem>(Func<AnQLParserOptions, TBuilder> creator)
+        where TBuilder : IAnQLParserBuilder<TReturn, TItem>
     {
         return creator(_options);
     }

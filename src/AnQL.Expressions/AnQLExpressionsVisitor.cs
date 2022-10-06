@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using AnQL.Core;
+using AnQL.Core.Extensions;
 using AnQL.Core.Resolvers;
 using AnQL.Expressions.Helpers;
 
@@ -64,22 +65,22 @@ internal class AnQLExpressionsVisitor<T> : AnQLGrammarBaseVisitor<Expression<Fun
         return expr == null ? null : Expression.Lambda<Func<T, bool>>(Expression.Not(expr.Body), expr.Parameters);
     }
 
-    public override Expression<Func<T, bool>> VisitEq(AnQLGrammarParser.EqContext context)
+    public override Expression<Func<T, bool>> VisitEqual(AnQLGrammarParser.EqualContext context)
     {
         return BuildFilter(QueryOperation.Equal, context.property_path(), context.value());
     }
 
-    public override Expression<Func<T, bool>> VisitGt(AnQLGrammarParser.GtContext context)
+    public override Expression<Func<T, bool>> VisitGreaterThan(AnQLGrammarParser.GreaterThanContext context)
     {
         return BuildFilter(QueryOperation.GreaterThan, context.property_path(), context.value());
     }
 
-    public override Expression<Func<T, bool>> VisitLt(AnQLGrammarParser.LtContext context)
+    public override Expression<Func<T, bool>> VisitLessThan(AnQLGrammarParser.LessThanContext context)
     {
         return BuildFilter(QueryOperation.LessThan, context.property_path(), context.value());
     }
 
-    public override Expression<Func<T, bool>> VisitAnyEq(AnQLGrammarParser.AnyEqContext context)
+    public override Expression<Func<T, bool>> VisitAnyEqual(AnQLGrammarParser.AnyEqualContext context)
     {
         return context.value()
             .Select(valueContext => BuildFilter(QueryOperation.Equal, context.property_path(), valueContext))
@@ -100,50 +101,9 @@ internal class AnQLExpressionsVisitor<T> : AnQLGrammarBaseVisitor<Expression<Fun
         if (resolver == null)
             return Expression.Lambda<Func<T, bool>>(Expression.Default(typeof(T)), Parameter);
 
-        var (value, type) = GetNativeValue(valueContext);
+        var (value, type) = valueContext.GetValueAndAnQLType();
 
         var resolvedExpression = resolver.Resolve(operation, value, type);
         return Expression.Lambda<Func<T, bool>>(resolvedExpression.Body.Replace(resolvedExpression.Parameters[0], Parameter), Parameter);
-    }
-    
-    /// <summary>
-    /// Get the native value from the text value in the parse tree value context.
-    /// </summary>
-    /// <param name="context">Value context in parse tree</param>
-    /// <returns>A tuple of the native value and value type</returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    private static (string, AnQLValueType) GetNativeValue(AnQLGrammarParser.ValueContext context)
-    {
-        var value = context.GetText();
-        switch (context)
-        {
-            case AnQLGrammarParser.NullContext:
-                return (value, AnQLValueType.Null);
-            case AnQLGrammarParser.BoolContext:
-                return (value, AnQLValueType.Bool);
-            case AnQLGrammarParser.NumberContext:
-                return (value, AnQLValueType.Number);
-            case AnQLGrammarParser.StringContext:
-                // Remove single quotes from start and end of string
-                return (ExtractStringValue(value), AnQLValueType.String);
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        string ExtractStringValue(string toExtract)
-        {
-            // First remove surrounding quotes
-            var firstChar = toExtract[0];
-
-            // If it doesn't start with a quote, return early
-            if (firstChar != '\'' && firstChar != '"')
-                return toExtract;
-
-            var extractedString = toExtract.Substring(1, value.Length - 2);
-
-            // Replace any escaped internal single quotes
-            extractedString = extractedString.Replace(@"\'", "'");
-            return extractedString;
-        }
     }
 }

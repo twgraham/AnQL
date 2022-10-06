@@ -1,5 +1,7 @@
 grammar AnQLGrammar;
 
+options { caseInsensitive=true; }
+
 AND:            'and' | '&';
 OR:             'or';
 NOT:            'not' | '!';
@@ -77,10 +79,10 @@ text: (QUOTE | STOPWORD | WORD)+;
 
 property_path : property ('.' property)* ;
 
-keyOpValue  : property_path ':' '>' value                  # Gt
-            | property_path ':' '<' value                  # Lt
-            | property_path ':' value                      # Eq
-            | property_path ':' value (',' value)+         # AnyEq
+keyOpValue  : property_path ':' '>' value                  # GreaterThan
+            | property_path ':' '<' value                  # LessThan
+            | property_path ':' value                      # Equal
+            | property_path ':' value (',' value)+         # AnyEqual
             ;
 
 property: (WORD ('_' WORD)* | reserved_word);
