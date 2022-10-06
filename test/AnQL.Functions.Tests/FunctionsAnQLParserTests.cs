@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AnQL.Core;
 using AnQL.Functions.Tests.Utilities;
 using FluentAssertions;
@@ -28,20 +29,23 @@ public class FunctionsAnQLParserTests
     }
     
     [Fact]
-    public void Parse_StringPropertyWithRegex_ShouldReturnCorrectFunction()
+    public void Parse_NestedStringProperty_ShouldReturnCorrectFunction()
     {
         const string query = "StringProperty: tes";
         
         var anqlParser = new AnQLBuilder().ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.StringProperty, opts =>
+            .WithNestedProperties(x => x.NestedDemos, ctx =>
             {
-                opts.RegexMatching = true;
+                ctx.WithValueProperty(x => x.StringProperty, opts => opts.RegexMatching = true);
             })
             .Build();
 
         var demo = new DemoClass
         {
-            StringProperty = "test"
+            NestedDemos = new List<NestedDemoClass>
+            {
+                new() { StringProperty = "test" }
+            }
         };
         
         var queryFunction = anqlParser.Parse(query);

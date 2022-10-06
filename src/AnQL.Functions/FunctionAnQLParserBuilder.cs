@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using AnQL.Core;
 using AnQL.Core.Helpers;
 using AnQL.Core.Resolvers;
+using AnQL.Functions.Fluent;
 using AnQL.Functions.Resolvers;
 
 namespace AnQL.Functions;
@@ -16,7 +17,7 @@ public class FunctionAnQLParserBuilder<T> : IAnQLParserBuilder<Func<T, bool>?, T
         _options = options;
     }
 
-    public IAnQLParserBuilder<Func<T, bool>?, T> WithValueProperty<TItem>(Expression<Func<T, TItem>> propertyPath,
+    public FunctionAnQLParserBuilder<T> WithValueProperty<TItem>(Expression<Func<T, TItem>> propertyPath,
         Action<ValueTypeResolver<T, TItem>.Options>? configureOptions = null)
         where TItem : IComparable<TItem>
     {
@@ -25,7 +26,7 @@ public class FunctionAnQLParserBuilder<T> : IAnQLParserBuilder<Func<T, bool>?, T
         return WithValueProperty(propertyName, propertyAccessor, configureOptions);
     }
 
-    public IAnQLParserBuilder<Func<T, bool>, T> WithValueProperty<TItem>(string name, Func<T, TItem> propertyAccessor,
+    public FunctionAnQLParserBuilder<T> WithValueProperty<TItem>(string name, Func<T, TItem> propertyAccessor,
         Action<ValueTypeResolver<T, TItem>.Options>? configureOptions = null)
         where TItem : IComparable<TItem>
     {
@@ -43,6 +44,19 @@ public class FunctionAnQLParserBuilder<T> : IAnQLParserBuilder<Func<T, bool>?, T
         where TValue : IComparable<TValue>
     {
         return WithValueProperty(name, propertyPath.Compile());
+    }
+
+    public FunctionAnQLParserBuilder<T> WithNestedProperties<TItem>(Func<T, IEnumerable<TItem>> collectionPath, Action<NestedPropertyContext<TItem>> configureContext)
+    {
+        var nestedContext = new NestedPropertyContext<TItem>();
+        configureContext(nestedContext);
+        var nestedResolverMap = nestedContext.Build();
+        foreach (var (key, resolver) in nestedResolverMap)
+        {
+            _resolverMap.Add(key, new EnumerableNestedResolver<T,TItem>(collectionPath, resolver));
+        }
+
+        return this;
     }
 
     public IAnQLParserBuilder<Func<T, bool>?, T> WithProperty<TValue>(Expression<Func<T, TValue>> propertyPath)
