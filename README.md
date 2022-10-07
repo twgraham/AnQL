@@ -9,6 +9,12 @@
   <p align="center">
     Another Query Language - simple, no nonsense querying for C#/ASP.NET/TypeScript 
     <br />
+    <a href="https://codecov.io/github/twgraham/AnQL">
+        <img src="https://github.com/twgraham/AnQL/actions/workflows/build-test.yaml/badge.svg" />
+    </a>
+    <a href="https://codecov.io/github/twgraham/AnQL" > 
+        <img src="https://codecov.io/github/twgraham/AnQL/branch/master/graph/badge.svg?token=FUJXCID1YL"/> 
+    </a>
 </p>
 
 This project is still a work in progress.
