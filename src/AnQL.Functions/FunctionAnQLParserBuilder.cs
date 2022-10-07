@@ -34,12 +34,6 @@ public class FunctionAnQLParserBuilder<T> : IAnQLParserBuilder<Func<T, bool>?, T
         return this;
     }
 
-    public IAnQLParserBuilder<Func<T, bool>?, T> WithProperty<TItem>(string name, IAnQLPropertyResolver<Func<T, bool>?> propertyResolver)
-    {
-        _resolverMap.Add(name, propertyResolver);
-        return this;
-    }
-
     public IAnQLParserBuilder<Func<T, bool>?, T> WithProperty<TValue>(string name, Expression<Func<T, TValue>> propertyPath)
         where TValue : IComparable<TValue>
     {
@@ -66,7 +60,8 @@ public class FunctionAnQLParserBuilder<T> : IAnQLParserBuilder<Func<T, bool>?, T
 
     public IAnQLParserBuilder<Func<T, bool>?, T> WithProperty(string name, IAnQLPropertyResolver<Func<T, bool>?> propertyResolver)
     {
-        throw new NotImplementedException();
+        _resolverMap.Add(name, propertyResolver);
+        return this;
     }
 
     public IAnQLParser<Func<T, bool>?> Build()

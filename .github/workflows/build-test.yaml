@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: Build and test
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -20,4 +21,6 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --collect:"XPlat Code Coverage" --no-build --verbosity normal
+    - uses: codecov/codecov-action@v3
+      if: ${{ always() }}
