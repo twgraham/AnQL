@@ -1,30 +1,30 @@
 using AnQL.Core;
 using AnQL.Core.Extensions;
+using AnQL.Core.Grammar;
 using AnQL.Core.Resolvers;
 
 namespace AnQL.Functions;
 
-public class AnQLFunctionsVisitor<T> : AnQLGrammarBaseVisitor<Func<T, bool>?>
+public class AnQLFunctionsVisitor<T> : AnQLBaseVisitor<Func<T, bool>>
 {
     private static readonly Func<T, bool> AlwaysTrue = _ => true;
     private static readonly Func<T, bool> AlwaysFalse = _ => false;
 
     private readonly Dictionary<string, IAnQLPropertyResolver<Func<T, bool>>> _resolverMap;
 
-    public AnQLFunctionsVisitor(Dictionary<string, IAnQLPropertyResolver<Func<T, bool>>> resolverMap)
+    public override Func<T, bool> SuccessQueryResult => AlwaysTrue;
+    public override Func<T, bool> FailedQueryResult => AlwaysFalse;
+
+    public AnQLFunctionsVisitor(Dictionary<string, IAnQLPropertyResolver<Func<T, bool>>> resolverMap,
+        AnQLParserOptions options) : base(options)
     {
         _resolverMap = resolverMap;
     }
 
-    public override Func<T, bool> VisitQuery(AnQLGrammarParser.QueryContext context)
+    public override Func<T, bool> VisitExprAND(AnQLGrammarParser.ExprANDContext context)
     {
-        return base.VisitQuery(context) ?? AlwaysFalse;
-    }
-
-    public override Func<T, bool>? VisitExprAND(AnQLGrammarParser.ExprANDContext context)
-    {
-        var left = Visit(context.expr(0)) ?? AlwaysTrue;
-        var right = Visit(context.expr(1)) ?? AlwaysTrue;
+        var left = Visit(context.expr(0));
+        var right = Visit(context.expr(1));
         
         if (left == AlwaysTrue && right == AlwaysTrue)
             return null;
@@ -32,7 +32,7 @@ public class AnQLFunctionsVisitor<T> : AnQLGrammarBaseVisitor<Func<T, bool>?>
         return value => left(value) && right(value);
     }
     
-    public override Func<T, bool>? VisitExprOR(AnQLGrammarParser.ExprORContext context)
+    public override Func<T, bool> VisitExprOR(AnQLGrammarParser.ExprORContext context)
     {
         var left = Visit(context.expr(0)) ?? AlwaysFalse;
         var right = Visit(context.expr(1)) ?? AlwaysFalse;
@@ -43,7 +43,7 @@ public class AnQLFunctionsVisitor<T> : AnQLGrammarBaseVisitor<Func<T, bool>?>
         return value => left(value) || right(value);
     }
 
-    public override Func<T, bool>? VisitNOT(AnQLGrammarParser.NOTContext context)
+    public override Func<T, bool> VisitNOT(AnQLGrammarParser.NOTContext context)
     {
         var inner = Visit(context.expr());
 
@@ -53,7 +53,7 @@ public class AnQLFunctionsVisitor<T> : AnQLGrammarBaseVisitor<Func<T, bool>?>
         return value => !inner(value);
     }
 
-    public override Func<T, bool>? VisitParens(AnQLGrammarParser.ParensContext context)
+    public override Func<T, bool> VisitParens(AnQLGrammarParser.ParensContext context)
     {
         return Visit(context.expr());
     }
@@ -85,7 +85,7 @@ public class AnQLFunctionsVisitor<T> : AnQLGrammarBaseVisitor<Func<T, bool>?>
         _resolverMap.TryGetValue(propertyPathContext.GetText(), out var resolver);
 
         if (resolver == null)
-            return AlwaysFalse;
+            return HandleUnknownProperty(propertyPathContext);
 
         var (value, type) = valueContext.GetValueAndAnQLType();
 

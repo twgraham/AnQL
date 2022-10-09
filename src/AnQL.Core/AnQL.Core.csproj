@@ -15,7 +15,7 @@
         <Antlr4 Include="Grammar/AnQLGrammar.g4">
             <Listener>false</Listener>
             <Visitor>true</Visitor>
-            <Package>AnQL.Core</Package>
+            <Package>AnQL.Core.Grammar</Package>
             <Error>true</Error>
             <DOptions>language=CSharp</DOptions>
         </Antlr4>

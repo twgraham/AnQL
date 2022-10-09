@@ -4,7 +4,7 @@ using AnQL.Core.Resolvers;
 
 namespace AnQL.Expressions;
 
-internal class ExpressionAnQLParserBuilder<T> : IAnQLParserBuilder<Expression<Func<T, bool>>?, T>
+internal class ExpressionAnQLParserBuilder<T> : IAnQLParserBuilder<Expression<Func<T, bool>>, T>
 {
     private readonly AnQLParserOptions _options;
     private readonly Dictionary<string, IAnQLPropertyResolver<Expression<Func<T, bool>>>> _resolverMap = new();
@@ -13,13 +13,13 @@ internal class ExpressionAnQLParserBuilder<T> : IAnQLParserBuilder<Expression<Fu
     {
         _options = options;
     }
-
-    public IAnQLParserBuilder<Expression<Func<T, bool>>?, T> WithProperty<TValue>(string name, Expression<Func<T, TValue>> propertyPath)
+    
+    public IAnQLParserBuilder<Expression<Func<T, bool>>, T> WithProperty<TValue>(Expression<Func<T, TValue>> propertyPath)
     {
         throw new NotImplementedException();
     }
 
-    public IAnQLParserBuilder<Expression<Func<T, bool>>?, T> WithProperty<TValue>(Expression<Func<T, TValue>> propertyPath)
+    public IAnQLParserBuilder<Expression<Func<T, bool>>, T> WithProperty(string name, IAnQLPropertyResolver<Expression<Func<T, bool>>> propertyResolver)
     {
         throw new NotImplementedException();
     }
@@ -29,8 +29,8 @@ internal class ExpressionAnQLParserBuilder<T> : IAnQLParserBuilder<Expression<Fu
         throw new NotImplementedException();
     }
 
-    public IAnQLParser<Expression<Func<T, bool>>?> Build()
+    public IAnQLParser<Expression<Func<T, bool>>> Build()
     {
-        return new ExpressionAnQLParser<T>(_resolverMap);
+        return new AnQLParser<Expression<Func<T, bool>>>(new AnQLExpressionsVisitor<T>(_resolverMap, _options));
     }
 }

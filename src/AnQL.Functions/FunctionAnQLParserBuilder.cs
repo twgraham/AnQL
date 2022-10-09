@@ -7,10 +7,10 @@ using AnQL.Functions.Resolvers;
 
 namespace AnQL.Functions;
 
-public class FunctionAnQLParserBuilder<T> : IAnQLParserBuilder<Func<T, bool>?, T>
+public class FunctionAnQLParserBuilder<T> : IAnQLParserBuilder<Func<T, bool>, T>
 {
     private readonly AnQLParserOptions _options;
-    private readonly Dictionary<string, IAnQLPropertyResolver<Func<T, bool>?>> _resolverMap = new();
+    private readonly Dictionary<string, IAnQLPropertyResolver<Func<T, bool>>> _resolverMap = new();
 
     public FunctionAnQLParserBuilder(AnQLParserOptions options)
     {
@@ -34,7 +34,7 @@ public class FunctionAnQLParserBuilder<T> : IAnQLParserBuilder<Func<T, bool>?, T
         return this;
     }
 
-    public IAnQLParserBuilder<Func<T, bool>?, T> WithProperty<TValue>(string name, Expression<Func<T, TValue>> propertyPath)
+    public IAnQLParserBuilder<Func<T, bool>, T> WithProperty<TValue>(string name, Expression<Func<T, TValue>> propertyPath)
         where TValue : IComparable<TValue>
     {
         return WithValueProperty(name, propertyPath.Compile());
@@ -53,19 +53,19 @@ public class FunctionAnQLParserBuilder<T> : IAnQLParserBuilder<Func<T, bool>?, T
         return this;
     }
 
-    public IAnQLParserBuilder<Func<T, bool>?, T> WithProperty<TValue>(Expression<Func<T, TValue>> propertyPath)
+    public IAnQLParserBuilder<Func<T, bool>, T> WithProperty<TValue>(Expression<Func<T, TValue>> propertyPath)
     {
         throw new NotImplementedException();
     }
 
-    public IAnQLParserBuilder<Func<T, bool>?, T> WithProperty(string name, IAnQLPropertyResolver<Func<T, bool>?> propertyResolver)
+    public IAnQLParserBuilder<Func<T, bool>, T> WithProperty(string name, IAnQLPropertyResolver<Func<T, bool>> propertyResolver)
     {
         _resolverMap.Add(name, propertyResolver);
         return this;
     }
 
-    public IAnQLParser<Func<T, bool>?> Build()
+    public IAnQLParser<Func<T, bool>> Build()
     {
-        return new FunctionAnQLParser<T>(_resolverMap);
+        return new AnQLParser<Func<T, bool>>(new AnQLFunctionsVisitor<T>(_resolverMap, _options));
     }
 }

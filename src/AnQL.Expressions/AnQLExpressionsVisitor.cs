@@ -1,12 +1,13 @@
 using System.Linq.Expressions;
 using AnQL.Core;
 using AnQL.Core.Extensions;
+using AnQL.Core.Grammar;
 using AnQL.Core.Resolvers;
 using AnQL.Expressions.Helpers;
 
 namespace AnQL.Expressions;
 
-internal class AnQLExpressionsVisitor<T> : AnQLGrammarBaseVisitor<Expression<Func<T, bool>>?>
+public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<Expression<Func<T, bool>>>
 {
     private static readonly ConstantExpression TrueConstant = Expression.Constant(true);
     private static readonly ConstantExpression FalseConstant = Expression.Constant(false);
@@ -15,8 +16,12 @@ internal class AnQLExpressionsVisitor<T> : AnQLGrammarBaseVisitor<Expression<Fun
     private static readonly Expression<Func<T, bool>> FalseExpression = Expression.Lambda<Func<T, bool>>(FalseConstant, Parameter);
 
     private readonly Dictionary<string, IAnQLPropertyResolver<Expression<Func<T, bool>>>> _resolverMap;
+
+    public override Expression<Func<T, bool>> SuccessQueryResult => TrueExpression;
+    public override Expression<Func<T, bool>> FailedQueryResult => FalseExpression;
     
-    public AnQLExpressionsVisitor(Dictionary<string, IAnQLPropertyResolver<Expression<Func<T, bool>>>> resolverMap)
+    public AnQLExpressionsVisitor(Dictionary<string, IAnQLPropertyResolver<Expression<Func<T, bool>>>> resolverMap, AnQLParserOptions options)
+        : base(options)
     {
         _resolverMap = resolverMap;
     }
@@ -26,7 +31,7 @@ internal class AnQLExpressionsVisitor<T> : AnQLGrammarBaseVisitor<Expression<Fun
         return base.VisitQuery(context) ?? TrueExpression;
     }
 
-    public override Expression<Func<T, bool>>? VisitExprAND(AnQLGrammarParser.ExprANDContext context)
+    public override Expression<Func<T, bool>> VisitExprAND(AnQLGrammarParser.ExprANDContext context)
     {
         // If either side of the expression is null, then we should evaluate it as a constant true.
         // This way the other side of the AND expression becomes determinant
@@ -40,7 +45,7 @@ internal class AnQLExpressionsVisitor<T> : AnQLGrammarBaseVisitor<Expression<Fun
         return left.Update(Expression.AndAlso(left.Body, right.Body), new []{Parameter});
     }
 
-    public override Expression<Func<T, bool>>? VisitExprOR(AnQLGrammarParser.ExprORContext context)
+    public override Expression<Func<T, bool>> VisitExprOR(AnQLGrammarParser.ExprORContext context)
     {
         // If either side of the expression is null, then we should evaluate it as a constant false.
         // This way the other side of the OR expression becomes determinant
@@ -54,12 +59,12 @@ internal class AnQLExpressionsVisitor<T> : AnQLGrammarBaseVisitor<Expression<Fun
         return left.Update(Expression.OrElse(left.Body, right.Body), new []{Parameter});
     }
 
-    public override Expression<Func<T, bool>>? VisitParens(AnQLGrammarParser.ParensContext context)
+    public override Expression<Func<T, bool>> VisitParens(AnQLGrammarParser.ParensContext context)
     {
         return Visit(context.expr());
     }
 
-    public override Expression<Func<T, bool>>? VisitNOT(AnQLGrammarParser.NOTContext context)
+    public override Expression<Func<T, bool>> VisitNOT(AnQLGrammarParser.NOTContext context)
     {
         var expr = Visit(context.expr());
         return expr == null ? null : Expression.Lambda<Func<T, bool>>(Expression.Not(expr.Body), expr.Parameters);

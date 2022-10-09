@@ -3,12 +3,11 @@ using AnQL.Core.Resolvers;
 
 namespace AnQL.Core;
 
-public interface IAnQLParserBuilder<out TReturn, TItem>
+public interface IAnQLParserBuilder<TReturn, TItem>
 {
     IAnQLParserBuilder<TReturn, TItem> WithProperty<TValue>(Expression<Func<TItem, TValue>> propertyPath);
 
-    IAnQLParserBuilder<TReturn, TItem> WithProperty(string name,
-        IAnQLPropertyResolver<Func<TItem, bool>?> propertyResolver);
+    IAnQLParserBuilder<TReturn, TItem> WithProperty(string name, IAnQLPropertyResolver<TReturn> propertyResolver);
 
     IAnQLParser<TReturn> Build();
 }
