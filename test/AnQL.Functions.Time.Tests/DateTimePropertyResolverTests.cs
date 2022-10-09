@@ -38,4 +38,18 @@ public class DateTimePropertyResolverTests
         
         func(dataset).Should().BeTrue();
     }
+    
+    [Fact]
+    public void Resolve_MonthEqualsReverseRange_ShouldReturnTrue()
+    {
+        const string query = "Between June 2023 and March 2022";
+        var dataset = new DemoClass
+        {
+            DateTimeProperty = new DateTime(2022, 5, 1)
+        };
+        var sut = new DateTimePropertyResolver<DemoClass>(x => x.DateTimeProperty);
+        var func = sut.Resolve(QueryOperation.Equal, query, AnQLValueType.String);
+        
+        func(dataset).Should().BeTrue();
+    }
 }

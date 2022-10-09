@@ -49,21 +49,19 @@ public class DateTimePropertyResolver<T> : IAnQLPropertyResolver<Func<T, bool>>
                     _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
                 };
             }
-            else
-            {
-                var dateValue = TimeZoneInfo.ConvertTime(
-                    DateTimeOffset.Parse(resolutionValues[0]["value"], CultureInfo.InvariantCulture), _options.TimeZone);
 
-                var (min, max) = ClampDate(dateValue, TimeUnit.Day);
+            var dateValue = TimeZoneInfo.ConvertTime(
+                DateTimeOffset.Parse(resolutionValues[0]["value"], CultureInfo.InvariantCulture), _options.TimeZone);
+
+            var (min, max) = ClampDate(dateValue, _options.ClampExactEqualsUnit);
                 
-                return op switch
-                {
-                    QueryOperation.Equal => BuildWithinRange(min - Common.OneTick, max),
-                    QueryOperation.GreaterThan => BuildGreaterThan(dateValue),
-                    QueryOperation.LessThan => BuildLessThan(dateValue),
-                    _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
-                };
-            }
+            return op switch
+            {
+                QueryOperation.Equal => BuildWithinRange(min - Common.OneTick, max),
+                QueryOperation.GreaterThan => BuildGreaterThan(dateValue),
+                QueryOperation.LessThan => BuildLessThan(dateValue),
+                _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
+            };
         }
         catch
         {
@@ -128,5 +126,6 @@ public class DateTimePropertyResolver<T> : IAnQLPropertyResolver<Func<T, bool>>
     public class Options
     {
         public TimeZoneInfo TimeZone { get; set; } = TimeZoneInfo.Utc;
+        public TimeUnit ClampExactEqualsUnit { get; set; } = TimeUnit.Day;
     }
 }
