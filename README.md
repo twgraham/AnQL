@@ -45,8 +45,10 @@ public class Employee
 ```
 
 ```csharp
-// Create the parser - you can selectively register properties, or customize their matching logic
-private static readonly AnQLParser<Employee> _employeeQueryParser = new AnQLBuilder()
+// Create the parser
+// you can selectively register properties on your class
+// or customize their matching logic
+AnQLParser<Employee> _employeeQueryParser = new AnQLBuilder()
   .ForFunctions<Employee>()
   .RegisterAllProperties();
 
