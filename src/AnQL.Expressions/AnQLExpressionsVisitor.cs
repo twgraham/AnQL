@@ -26,35 +26,18 @@ public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<Expression<Func<T, bool
         _resolverMap = resolverMap;
     }
 
-    public override Expression<Func<T, bool>> VisitQuery(AnQLGrammarParser.QueryContext context)
-    {
-        return base.VisitQuery(context) ?? TrueExpression;
-    }
-
     public override Expression<Func<T, bool>> VisitExprAND(AnQLGrammarParser.ExprANDContext context)
     {
-        // If either side of the expression is null, then we should evaluate it as a constant true.
-        // This way the other side of the AND expression becomes determinant
-        var left = Visit(context.expr(0)) ?? TrueExpression;
-        var right = Visit(context.expr(1)) ?? TrueExpression;
-
-        // If both sides evaluate to null, then return null
-        if (left == TrueExpression && right == TrueExpression)
-            return null;
+        var left = Visit(context.expr(0));
+        var right = Visit(context.expr(1));
 
         return left.Update(Expression.AndAlso(left.Body, right.Body), new []{Parameter});
     }
 
     public override Expression<Func<T, bool>> VisitExprOR(AnQLGrammarParser.ExprORContext context)
     {
-        // If either side of the expression is null, then we should evaluate it as a constant false.
-        // This way the other side of the OR expression becomes determinant
-        var left = Visit(context.expr(0)) ?? FalseExpression;
-        var right = Visit(context.expr(1)) ?? FalseExpression;
-
-        // If both sides evaluate to null, then return null
-        if (left == FalseExpression && right == FalseExpression)
-            return null;
+        var left = Visit(context.expr(0));
+        var right = Visit(context.expr(1));
 
         return left.Update(Expression.OrElse(left.Body, right.Body), new []{Parameter});
     }
@@ -67,7 +50,7 @@ public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<Expression<Func<T, bool
     public override Expression<Func<T, bool>> VisitNOT(AnQLGrammarParser.NOTContext context)
     {
         var expr = Visit(context.expr());
-        return expr == null ? null : Expression.Lambda<Func<T, bool>>(Expression.Not(expr.Body), expr.Parameters);
+        return Expression.Lambda<Func<T, bool>>(Expression.Not(expr.Body), expr.Parameters);
     }
 
     public override Expression<Func<T, bool>> VisitEqual(AnQLGrammarParser.EqualContext context)
@@ -104,7 +87,7 @@ public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<Expression<Func<T, bool
         _resolverMap.TryGetValue(propertyPathContext.GetText().ToLower(), out var resolver);
 
         if (resolver == null)
-            return Expression.Lambda<Func<T, bool>>(Expression.Default(typeof(T)), Parameter);
+            return HandleUnknownProperty(propertyPathContext);
 
         var (value, type) = valueContext.GetValueAndAnQLType();
 

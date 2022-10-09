@@ -25,20 +25,14 @@ public class AnQLFunctionsVisitor<T> : AnQLBaseVisitor<Func<T, bool>>
     {
         var left = Visit(context.expr(0));
         var right = Visit(context.expr(1));
-        
-        if (left == AlwaysTrue && right == AlwaysTrue)
-            return null;
 
         return value => left(value) && right(value);
     }
     
     public override Func<T, bool> VisitExprOR(AnQLGrammarParser.ExprORContext context)
     {
-        var left = Visit(context.expr(0)) ?? AlwaysFalse;
-        var right = Visit(context.expr(1)) ?? AlwaysFalse;
-        
-        if (left == AlwaysFalse && right == AlwaysFalse)
-            return null;
+        var left = Visit(context.expr(0));
+        var right = Visit(context.expr(1));
 
         return value => left(value) || right(value);
     }
@@ -46,10 +40,6 @@ public class AnQLFunctionsVisitor<T> : AnQLBaseVisitor<Func<T, bool>>
     public override Func<T, bool> VisitNOT(AnQLGrammarParser.NOTContext context)
     {
         var inner = Visit(context.expr());
-
-        if (inner == null)
-            return null;
-
         return value => !inner(value);
     }
 

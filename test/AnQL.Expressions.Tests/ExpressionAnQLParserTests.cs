@@ -15,7 +15,7 @@ public class ExpressionAnQLParserTests
         var anqlParser = new AnQLBuilder().ForExpressions<DemoClass>().Build();
         var expression = anqlParser.Parse(query);
 
-        expression.Should().BeOfType<ConstantExpression>().Which.Value.Should().Be(true);
+        expression.Body.Should().BeOfType<ConstantExpression>().Which.Value.Should().Be(true);
     }
 
     private class DemoClass
