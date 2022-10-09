@@ -52,4 +52,38 @@ public class DateTimePropertyResolverTests
         
         func(dataset).Should().BeTrue();
     }
+
+    [Theory]
+    [InlineData(QueryOperation.Equal)]
+    [InlineData(QueryOperation.GreaterThan)]
+    [InlineData(QueryOperation.LessThan)]
+    public void Resolve_NonDateValue_ShouldReturnFalse(QueryOperation operation)
+    {
+        const string query = "hello";
+        var dataset = new DemoClass
+        {
+            DateTimeProperty = new DateTime(2022, 5, 1)
+        };
+        var sut = new DateTimePropertyResolver<DemoClass>(x => x.DateTimeProperty);
+        var func = sut.Resolve(operation, query, AnQLValueType.String);
+        
+        func(dataset).Should().BeFalse();
+    }
+    
+    [Theory]
+    [InlineData(QueryOperation.Equal)]
+    [InlineData(QueryOperation.GreaterThan)]
+    [InlineData(QueryOperation.LessThan)]
+    public void Resolve_TimeValue_ShouldReturnFalse(QueryOperation operation)
+    {
+        const string query = "12PM";
+        var dataset = new DemoClass
+        {
+            DateTimeProperty = new DateTime(2022, 5, 1)
+        };
+        var sut = new DateTimePropertyResolver<DemoClass>(x => x.DateTimeProperty);
+        var func = sut.Resolve(operation, query, AnQLValueType.String);
+        
+        func(dataset).Should().BeFalse();
+    }
 }
