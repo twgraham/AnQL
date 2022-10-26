@@ -5,7 +5,7 @@ namespace AnQL.Expressions;
 
 public static class AnQLBuilderExtensions
 {
-    public static IAnQLParserBuilder<Expression<Func<T, bool>>, T> ForExpressions<T>(this AnQLBuilder anqlBuilder)
+    public static ExpressionAnQLParserBuilder<T> ForExpressions<T>(this AnQLBuilder anqlBuilder)
     {
         return anqlBuilder.For<ExpressionAnQLParserBuilder<T>, Expression<Func<T, bool>>, T>(Create<T>);
     }

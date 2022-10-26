@@ -15,6 +15,9 @@
     <a href="https://codecov.io/github/twgraham/AnQL" > 
         <img src="https://codecov.io/github/twgraham/AnQL/branch/master/graph/badge.svg?token=FUJXCID1YL"/> 
     </a>
+    <a href="https://codeclimate.com/github/twgraham/AnQL/maintainability">
+      <img src="https://api.codeclimate.com/v1/badges/182f472df6db393c2bee/maintainability" />
+    </a>
 </p>
 
 This project is still a work in progress.

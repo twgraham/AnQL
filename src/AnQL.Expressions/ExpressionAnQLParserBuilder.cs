@@ -1,36 +1,16 @@
 using System.Linq.Expressions;
 using AnQL.Core;
-using AnQL.Core.Resolvers;
 
 namespace AnQL.Expressions;
 
-internal class ExpressionAnQLParserBuilder<T> : IAnQLParserBuilder<Expression<Func<T, bool>>, T>
+public class ExpressionAnQLParserBuilder<T> : AnQLParserBuilder<Expression<Func<T, bool>>, T>
 {
-    private readonly AnQLParserOptions _options;
-    private readonly Dictionary<string, IAnQLPropertyResolver<Expression<Func<T, bool>>>> _resolverMap = new();
-
-    public ExpressionAnQLParserBuilder(AnQLParserOptions options)
+    public ExpressionAnQLParserBuilder(AnQLParserOptions options) : base(options)
     {
-        _options = options;
-    }
-    
-    public IAnQLParserBuilder<Expression<Func<T, bool>>, T> WithProperty<TValue>(Expression<Func<T, TValue>> propertyPath)
-    {
-        throw new NotImplementedException();
     }
 
-    public IAnQLParserBuilder<Expression<Func<T, bool>>, T> WithProperty(string name, IAnQLPropertyResolver<Expression<Func<T, bool>>> propertyResolver)
+    public override IAnQLParser<Expression<Func<T, bool>>> Build()
     {
-        throw new NotImplementedException();
-    }
-
-    public IAnQLParserBuilder<Expression<Func<T, bool>>?, T> WithProperty(string name, IAnQLPropertyResolver<Func<T, bool>?> propertyResolver)
-    {
-        throw new NotImplementedException();
-    }
-
-    public IAnQLParser<Expression<Func<T, bool>>> Build()
-    {
-        return new AnQLParser<Expression<Func<T, bool>>>(new AnQLExpressionsVisitor<T>(_resolverMap, _options));
+        return new AnQLParser<Expression<Func<T, bool>>>(new AnQLExpressionsVisitor<T>(ResolverMap, Options));
     }
 }

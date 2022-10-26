@@ -10,13 +10,12 @@ public class AnQLFunctionsVisitor<T> : AnQLBaseVisitor<Func<T, bool>>
     private static readonly Func<T, bool> AlwaysTrue = _ => true;
     private static readonly Func<T, bool> AlwaysFalse = _ => false;
 
-    private readonly Dictionary<string, IAnQLPropertyResolver<Func<T, bool>>> _resolverMap;
+    private readonly ResolverMap<Func<T, bool>, T> _resolverMap;
 
     public override Func<T, bool> SuccessQueryResult => AlwaysTrue;
     public override Func<T, bool> FailedQueryResult => AlwaysFalse;
 
-    public AnQLFunctionsVisitor(Dictionary<string, IAnQLPropertyResolver<Func<T, bool>>> resolverMap,
-        AnQLParserOptions options) : base(options)
+    public AnQLFunctionsVisitor(ResolverMap<Func<T, bool>, T> resolverMap, AnQLParserOptions options) : base(options)
     {
         _resolverMap = resolverMap;
     }
@@ -72,9 +71,7 @@ public class AnQLFunctionsVisitor<T> : AnQLBaseVisitor<Func<T, bool>>
 
     private Func<T, bool> BuildFilter(QueryOperation operation, AnQLGrammarParser.Property_pathContext propertyPathContext, AnQLGrammarParser.ValueContext valueContext)
     {
-        _resolverMap.TryGetValue(propertyPathContext.GetText(), out var resolver);
-
-        if (resolver == null)
+        if (!_resolverMap.TryGet(propertyPathContext.GetText(), out var resolver))
             return HandleUnknownProperty(propertyPathContext);
 
         var (value, type) = valueContext.GetValueAndAnQLType();

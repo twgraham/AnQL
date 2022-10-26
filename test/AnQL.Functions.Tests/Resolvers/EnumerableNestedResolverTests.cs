@@ -25,7 +25,7 @@ public class EnumerableNestedResolverTests
             }
         };
         var sut = new EnumerableNestedResolver<DemoClass, NestedDemoClass>(x => x.NestedDemos,
-            new ValueTypeResolver<NestedDemoClass, string>(x => x.StringProperty));
+            new ComparableTypeResolver<NestedDemoClass, string>(x => x.StringProperty));
         var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.String);
         
         func(dataset).Should().BeTrue();
@@ -47,7 +47,7 @@ public class EnumerableNestedResolverTests
             }
         };
         var sut = new EnumerableNestedResolver<DemoClass, NestedDemoClass>(x => x.NestedDemos,
-            new ValueTypeResolver<NestedDemoClass, string>(x => x.StringProperty));
+            new ComparableTypeResolver<NestedDemoClass, string>(x => x.StringProperty));
         var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.String);
         
         func(dataset).Should().BeFalse();

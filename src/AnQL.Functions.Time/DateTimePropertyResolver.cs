@@ -1,4 +1,7 @@
 using System.Globalization;
+using System.Linq.Expressions;
+using System.Reflection;
+using AnQL.Core.Helpers;
 using AnQL.Core.Resolvers;
 using Microsoft.Recognizers.Text.DateTime;
 
@@ -8,13 +11,23 @@ public class DateTimePropertyResolver<T> : IAnQLPropertyResolver<Func<T, bool>>
 {
     private static readonly Func<T, bool> AlwaysFalse = _ => false;
 
-    private readonly Func<T, DateTime> _propertyAccessor;
+    private readonly Func<T, DateTimeOffset> _propertyAccessor;
     private readonly Options _options = new();
 
-    public DateTimePropertyResolver(Func<T, DateTime> propertyAccessor, Action<Options>? configureOptions = null)
+    public DateTimePropertyResolver(Func<T, DateTimeOffset> propertyAccessor, Action<Options>? configureOptions = null)
     {
         _propertyAccessor = propertyAccessor;
         configureOptions?.Invoke(_options);
+    }
+    
+    public DateTimePropertyResolver(Func<T, DateTime> propertyAccessor, Action<Options>? configureOptions = null)
+        : this(ToDateTimeOffsetFunc(propertyAccessor), configureOptions)
+    {
+    }
+    
+    public DateTimePropertyResolver(Func<T, string> propertyAccessor, Action<Options>? configureOptions = null)
+        : this(ToDateTimeOffsetFunc(propertyAccessor), configureOptions)
+    {
     }
 
     public Func<T, bool> Resolve(QueryOperation op, string value, AnQLValueType valueType)
@@ -112,7 +125,45 @@ public class DateTimePropertyResolver<T> : IAnQLPropertyResolver<Func<T, bool>>
             _ => throw new ArgumentOutOfRangeException(nameof(timeUnit), timeUnit, null)
         };
     }
+    
+    private static Func<T, DateTimeOffset> CachedAccessor(Func<T, DateTimeOffset> accessor)
+    {
+        DateTimeOffset? cache = null;
+        return arg => cache ??= accessor(arg);
+    }
 
+    private static Func<T, DateTimeOffset> ToDateTimeOffsetFunc(Func<T, DateTime> func)
+        => arg => new DateTimeOffset(func(arg));
+    
+    private static Func<T, DateTimeOffset> ToDateTimeOffsetFunc(Func<T, string> func)
+        => arg => DateTimeOffset.Parse(func(arg));
+
+    public class Factory : IResolverFactory<T, Func<T, bool>>
+    {
+        private static readonly HashSet<Type> SupportedTypes = new()
+        {
+            typeof(DateTime),
+            typeof(DateTimeOffset),
+            typeof(string)
+        };
+
+        public IAnQLPropertyResolver<Func<T, bool>> Build(Expression<Func<T, object>> propertyPath)
+        {
+            var type = ExpressionHelper.GetPropertyPathType(propertyPath);
+
+            if (!SupportedTypes.Contains(type))
+                throw new ArgumentException(
+                    $"Property of type {type} cannot be used by {nameof(DateTimePropertyResolver<T>)}. Supported types: {string.Join(", ", SupportedTypes)}");
+
+            var path = Expression.Lambda(Expression.Convert(propertyPath.Body, type), propertyPath.Parameters);
+            var resolver = Activator.CreateInstance(typeof(DateTimePropertyResolver<T>), BindingFlags.CreateInstance |
+                                             BindingFlags.Public |
+                                             BindingFlags.Instance |
+                                             BindingFlags.OptionalParamBinding, null, new object?[] { path.Compile(), null }, null);
+            return (DateTimePropertyResolver<T>)resolver;
+        }
+    }
+    
     public enum TimeUnit
     {
         Second,

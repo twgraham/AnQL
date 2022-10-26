@@ -15,12 +15,12 @@ public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<Expression<Func<T, bool
     private static readonly Expression<Func<T, bool>> TrueExpression = Expression.Lambda<Func<T, bool>>(TrueConstant, Parameter);
     private static readonly Expression<Func<T, bool>> FalseExpression = Expression.Lambda<Func<T, bool>>(FalseConstant, Parameter);
 
-    private readonly Dictionary<string, IAnQLPropertyResolver<Expression<Func<T, bool>>>> _resolverMap;
+    private readonly ResolverMap<Expression<Func<T, bool>>, T> _resolverMap;
 
     public override Expression<Func<T, bool>> SuccessQueryResult => TrueExpression;
     public override Expression<Func<T, bool>> FailedQueryResult => FalseExpression;
     
-    public AnQLExpressionsVisitor(Dictionary<string, IAnQLPropertyResolver<Expression<Func<T, bool>>>> resolverMap, AnQLParserOptions options)
+    public AnQLExpressionsVisitor(ResolverMap<Expression<Func<T, bool>>, T> resolverMap, AnQLParserOptions options)
         : base(options)
     {
         _resolverMap = resolverMap;
@@ -84,9 +84,7 @@ public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<Expression<Func<T, bool
     /// <returns>Filter definition</returns>
     private Expression<Func<T, bool>> BuildFilter(QueryOperation operation, AnQLGrammarParser.Property_pathContext propertyPathContext, AnQLGrammarParser.ValueContext valueContext)
     {
-        _resolverMap.TryGetValue(propertyPathContext.GetText().ToLower(), out var resolver);
-
-        if (resolver == null)
+        if (!_resolverMap.TryGet(propertyPathContext.GetText().ToLower(), out var resolver))
             return HandleUnknownProperty(propertyPathContext);
 
         var (value, type) = valueContext.GetValueAndAnQLType();

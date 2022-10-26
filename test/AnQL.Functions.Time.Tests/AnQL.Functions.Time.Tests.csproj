@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\AnQL.Functions.Time\AnQL.Functions.Time.csproj" />
+      <ProjectReference Include="..\..\src\AnQL.Functions\AnQL.Functions.csproj" />
     </ItemGroup>
 
 </Project>

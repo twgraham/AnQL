@@ -17,7 +17,7 @@ public class FunctionsAnQLParserTests
         const string query = "IntProperty: 3";
 
         var anqlParser = new AnQLBuilder().ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.IntProperty)
+            .WithProperty(x => x.IntProperty)
             .Build();
 
         var demo = new DemoClass
@@ -38,7 +38,7 @@ public class FunctionsAnQLParserTests
 
         var anqlParser = new AnQLBuilder().ForFunctions<DemoClass>()
             .WithNestedProperties(x => x.NestedDemos,
-                ctx => { ctx.WithValueProperty(x => x.StringProperty, opts => opts.RegexMatching = true); })
+                ctx => { ctx.WithProperty(x => x.StringProperty, opts => opts.RegexMatching = true); })
             .Build();
 
         var demo = new DemoClass
@@ -65,7 +65,7 @@ public class FunctionsAnQLParserTests
         const string query = "IntProperty: > 2 AND IntProperty: < 5";
 
         var anqlParser = new AnQLBuilder().ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.IntProperty)
+            .WithProperty(x => x.IntProperty)
             .Build();
 
         var demoObjects = new[]
@@ -88,8 +88,8 @@ public class FunctionsAnQLParserTests
         const string query = "IntProperty: > 2 AND StringProperty: foo";
 
         var anqlParser = new AnQLBuilder().ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.IntProperty)
-            .WithValueProperty(x => x.StringProperty, conf => conf.RegexMatching = true)
+            .WithProperty(x => x.IntProperty)
+            .WithProperty(x => x.StringProperty, conf => conf.RegexMatching = true)
             .Build();
 
         var demoObjects = new[]
@@ -112,7 +112,7 @@ public class FunctionsAnQLParserTests
         const string query = "IntProperty: > 3 OR IntProperty: 2";
 
         var anqlParser = new AnQLBuilder().ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.IntProperty)
+            .WithProperty(x => x.IntProperty)
             .Build();
 
         var demoObjects = new[]
@@ -135,8 +135,8 @@ public class FunctionsAnQLParserTests
         const string query = "IntProperty: > 2 OR StringProperty: bar";
 
         var anqlParser = new AnQLBuilder().ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.IntProperty)
-            .WithValueProperty(x => x.StringProperty, conf => conf.RegexMatching = true)
+            .WithProperty(x => x.IntProperty)
+            .WithProperty(x => x.StringProperty, conf => conf.RegexMatching = true)
             .Build();
 
         var demoObjects = new[]
@@ -159,7 +159,7 @@ public class FunctionsAnQLParserTests
         const string query = "NOT IntProperty: > 2";
 
         var anqlParser = new AnQLBuilder().ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.IntProperty)
+            .WithProperty(x => x.IntProperty)
             .Build();
 
         var demoObjects = new[]
@@ -191,7 +191,7 @@ public class FunctionsAnQLParserTests
         };
 
         var anqlParser = new AnQLBuilder(options).ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.IntProperty)
+            .WithProperty(x => x.IntProperty)
             .Build();
 
         var demoObjects = new[]
@@ -219,7 +219,7 @@ public class FunctionsAnQLParserTests
         };
 
         var anqlParser = new AnQLBuilder(options).ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.IntProperty)
+            .WithProperty(x => x.IntProperty)
             .Build();
 
         var demoObjects = new[]
@@ -247,7 +247,7 @@ public class FunctionsAnQLParserTests
         };
 
         var anqlParser = new AnQLBuilder(options).ForFunctions<DemoClass>()
-            .WithValueProperty(x => x.IntProperty)
+            .WithProperty(x => x.IntProperty)
             .Build();
 
         var demoObjects = new[]
@@ -286,6 +286,28 @@ public class FunctionsAnQLParserTests
         
         var queryFunction = anqlParser.Parse(query);
         demoObjects.Where(queryFunction).Should().Contain(demoObjects);
+    }
+
+    #endregion
+
+    #region Register all properties with standard supported types
+
+    [Fact]
+    public void Parse_RegisterAllProperties_ShouldWorkForInt()
+    {
+        var anqlParser = new AnQLBuilder().ForFunctions<DemoClass>().RegisterAllProperties().Build();
+        
+        var demoObjects = new[]
+        {
+            new DemoClass { IntProperty = 2 },
+            new DemoClass { IntProperty = 3 },
+            new DemoClass { IntProperty = 4 },
+            new DemoClass { IntProperty = 5 }
+        };
+        
+        var queryFunction = anqlParser.Parse("IntProperty: > 3");
+        demoObjects.Where(queryFunction).Should().HaveCount(2)
+            .And.Contain(demoObjects[2..4]);
     }
 
     #endregion
