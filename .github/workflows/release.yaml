@@ -18,8 +18,8 @@ jobs:
       - name: Set VERSION variable from tag
         run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
       - name: Pack
-        run: dotnet pack --configuration Release /p:Version=${VERSION}
+        run: dotnet pack --configuration Release --output . /p:Version=${VERSION}
       - name: Publish (GitHub Packages)
-        run: dotnet nuget push src\**\*.nupkg --source https://nuget.pkg.github.com/twgraham/index.json --api-key ${{secrets.GITHUB_TOKEN}}
+        run: dotnet nuget push "*.nupkg" --source https://nuget.pkg.github.com/twgraham/index.json --api-key ${{secrets.GITHUB_TOKEN}}
       - name: Publish (NuGet Packages)
-        run: dotnet nuget push src\**\*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_TOKEN}}
+        run: dotnet nuget push "*.nupkg" --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_TOKEN}}
