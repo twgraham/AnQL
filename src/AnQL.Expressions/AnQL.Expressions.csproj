@@ -1,9 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <OutputType>library</OutputType>
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>AnQL.Expressions</PackageId>
+        <Authors>Taylor Graham</Authors>
+        <RepositoryUrl>https://github.com/twgraham/AnQL</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
