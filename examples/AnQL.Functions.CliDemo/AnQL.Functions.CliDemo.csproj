@@ -8,9 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\AnQL.Core\AnQL.Core.csproj" />
-      <ProjectReference Include="..\src\AnQL.Functions.Time\AnQL.Functions.Time.csproj" />
-      <ProjectReference Include="..\src\AnQL.Functions\AnQL.Functions.csproj" />
+      <ProjectReference Include="..\..\src\AnQL.Core\AnQL.Core.csproj" />
+      <ProjectReference Include="..\..\src\AnQL.Functions.Time\AnQL.Functions.Time.csproj" />
+      <ProjectReference Include="..\..\src\AnQL.Functions\AnQL.Functions.csproj" />
     </ItemGroup>
 
 </Project>
