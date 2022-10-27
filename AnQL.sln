@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnQL.Functions.Time.Tests",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{E4F2B84A-7523-4B46-9F20-CD7C3287077C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnQL.Functions.CliDemo", "AnQL.Functions.CliDemo\AnQL.Functions.CliDemo.csproj", "{2B2BFD4B-FEB8-423D-8DA8-5A1BFE8108F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnQL.Functions.CliDemo", "examples\AnQL.Functions.CliDemo\AnQL.Functions.CliDemo.csproj", "{2B2BFD4B-FEB8-423D-8DA8-5A1BFE8108F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
