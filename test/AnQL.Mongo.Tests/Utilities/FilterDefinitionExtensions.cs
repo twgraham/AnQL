@@ -10,4 +10,9 @@ public static class FilterDefinitionExtensions
     {
         return definition.Render(BsonSerializer.LookupSerializer<T>(), BsonSerializer.SerializerRegistry).ToJson();
     }
+
+    public static FilterDefinitionAssertions<T> Should<T>(this FilterDefinition<T> definition)
+    {
+        return new FilterDefinitionAssertions<T>(definition);
+    }
 }

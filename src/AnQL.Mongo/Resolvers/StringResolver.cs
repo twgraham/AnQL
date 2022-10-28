@@ -26,11 +26,11 @@ public class StringResolver<T> : SimpleResolver<T, string>
             QueryOperation.Equal => BuildEqual(value),
             QueryOperation.GreaterThan => BuildGreaterThan(value),
             QueryOperation.LessThan => BuildLessThan(value),
-            _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(op))
         };
     }
 
-    public class Factory : IResolverFactory<T, FilterDefinition<T>>
+    public new class Factory : IResolverFactory<T, FilterDefinition<T>>
     {
         public IAnQLPropertyResolver<FilterDefinition<T>> Build(Expression<Func<T, object>> propertyPath)
         {
@@ -38,15 +38,13 @@ public class StringResolver<T> : SimpleResolver<T, string>
             if (propertyType != typeof(string))
                 throw new ArgumentException("Property should be a string", nameof(propertyPath));
 
-            var stringExpression =
-                Expression.Lambda<Func<T, string>>(Expression.Convert(propertyPath.Body, typeof(string)),
-                    propertyPath.Parameters);
+            var stringExpression = (Expression<Func<T, string>>) ExpressionHelper.StripConvert(propertyPath);
 
             return new StringResolver<T>(stringExpression);
         }
     }
 
-    public class Options
+    public new class Options
     {
         public bool RegexMatching { get; set; } = false;
         public RegexOptions RegexOptions { get; set; } = RegexOptions.None;

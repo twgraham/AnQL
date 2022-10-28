@@ -17,7 +17,7 @@ public class SimpleResolver<T, TValue> : IAnQLPropertyResolver<FilterDefinition<
         PropertyPath = propertyPath;
         configureOptions?.Invoke(_options);
     }
-    
+
     public virtual FilterDefinition<T> Resolve(QueryOperation op, string value, AnQLValueType valueType)
     {
         var converter = _options.ValueConverter ?? DefaultConverter;
@@ -57,8 +57,10 @@ public class SimpleResolver<T, TValue> : IAnQLPropertyResolver<FilterDefinition<
         {
             var propertyType = ExpressionHelper.GetPropertyPathType(propertyPath);
             var resolverType = typeof(SimpleResolver<,>).MakeGenericType(typeof(T), propertyType);
+            var unconvertedPath = ExpressionHelper.StripConvert(propertyPath);
 
-            var resolver = Activator.CreateInstance(resolverType, _flags, null, new object?[] { propertyPath, null });
+            var resolver = Activator.CreateInstance(resolverType, _flags, null, new object?[] { unconvertedPath }, null)
+                ?? throw new Exception("Unable to create resolver");
 
             return (IAnQLPropertyResolver<FilterDefinition<T>>)resolver;
         }
