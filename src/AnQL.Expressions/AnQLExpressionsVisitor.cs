@@ -4,16 +4,15 @@ using AnQL.Core.Extensions;
 using AnQL.Core.Grammar;
 using AnQL.Core.Resolvers;
 using AnQL.Expressions.Helpers;
+using static AnQL.Expressions.Constants;
 
 namespace AnQL.Expressions;
 
 public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<Expression<Func<T, bool>>>
 {
-    private static readonly ConstantExpression TrueConstant = Expression.Constant(true);
-    private static readonly ConstantExpression FalseConstant = Expression.Constant(false);
-    private static readonly ParameterExpression Parameter = Expression.Parameter(typeof(T));
-    private static readonly Expression<Func<T, bool>> TrueExpression = Expression.Lambda<Func<T, bool>>(TrueConstant, Parameter);
-    private static readonly Expression<Func<T, bool>> FalseExpression = Expression.Lambda<Func<T, bool>>(FalseConstant, Parameter);
+    private static readonly ParameterExpression Parameter = Expression.Parameter(typeof(T), "x");
+    private static readonly Expression<Func<T, bool>> TrueExpression = Expression.Lambda<Func<T, bool>>(TrueConstantExpression, Parameter);
+    private static readonly Expression<Func<T, bool>> FalseExpression = Expression.Lambda<Func<T, bool>>(FalseConstantExpression, Parameter);
 
     private readonly ResolverMap<Expression<Func<T, bool>>, T> _resolverMap;
 
@@ -84,7 +83,7 @@ public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<Expression<Func<T, bool
     /// <returns>Filter definition</returns>
     private Expression<Func<T, bool>> BuildFilter(QueryOperation operation, AnQLGrammarParser.Property_pathContext propertyPathContext, AnQLGrammarParser.ValueContext valueContext)
     {
-        if (!_resolverMap.TryGet(propertyPathContext.GetText().ToLower(), out var resolver))
+        if (!_resolverMap.TryGet(propertyPathContext.GetText(), out var resolver))
             return HandleUnknownProperty(propertyPathContext);
 
         var (value, type) = valueContext.GetValueAndAnQLType();

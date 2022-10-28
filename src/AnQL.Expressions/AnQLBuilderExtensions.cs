@@ -12,6 +12,19 @@ public static class AnQLBuilderExtensions
 
     private static ExpressionAnQLParserBuilder<T> Create<T>(AnQLParserOptions options)
     {
-        return new ExpressionAnQLParserBuilder<T>(options);
+        var builder = new ExpressionAnQLParserBuilder<T>(options);
+        
+        builder.RegisterComparableType<ushort>()
+            .RegisterComparableType<short>()
+            .RegisterComparableType<uint>()
+            .RegisterComparableType<int>()
+            .RegisterComparableType<ulong>()
+            .RegisterComparableType<long>()
+            .RegisterComparableType<float>()
+            .RegisterComparableType<double>()
+            .RegisterComparableType<decimal>()
+            .RegisterComparableType<string>();
+
+        return builder;
     }
 }
