@@ -16,7 +16,7 @@ public class StringResolver<T> : SimpleResolver<T, string>
         configureOptions?.Invoke(_options);
     }
 
-    public FilterDefinition<T> Resolve(QueryOperation op, string value, AnQLValueType valueType)
+    public override FilterDefinition<T> Resolve(QueryOperation op, string value, AnQLValueType valueType)
     {
         if (_options.RegexMatching && op == QueryOperation.Equal)
             return Builders<T>.Filter.Regex(new ExpressionFieldDefinition<T>(PropertyPath), new Regex(value, _options.RegexOptions));
