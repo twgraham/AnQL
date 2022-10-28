@@ -50,6 +50,12 @@ public class AnQLFilterDefinitionVisitor<T> : AnQLBaseVisitor<FilterDefinition<T
         return BuildFilter(QueryOperation.Equal, context.property_path(), context.value());
     }
 
+    public override FilterDefinition<T> VisitAnyEqual(AnQLGrammarParser.AnyEqualContext context)
+    {
+        var filters = context.value().Select(value => BuildFilter(QueryOperation.Equal, context.property_path(), value));
+        return Builders<T>.Filter.Or(filters);
+    }
+
     public override FilterDefinition<T> VisitGreaterThan(AnQLGrammarParser.GreaterThanContext context)
     {
         return BuildFilter(QueryOperation.GreaterThan, context.property_path(), context.value());
