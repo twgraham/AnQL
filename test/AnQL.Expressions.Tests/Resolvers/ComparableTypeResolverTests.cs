@@ -1,14 +1,12 @@
-using System;
-using System.Collections.Generic;
 using AnQL.Core.Resolvers;
-using AnQL.Functions.Resolvers;
-using AnQL.Functions.Tests.Utilities;
+using AnQL.Expressions.Resolvers;
+using AnQL.Expressions.Tests.Utilities;
 using FluentAssertions;
 using Xunit;
 
-namespace AnQL.Functions.Tests.Resolvers;
+namespace AnQL.Expressions.Tests.Resolvers;
 
-public class ValueTypeResolverTests
+public class ComparableTypeResolverTests
 {
     #region Integer values
     
@@ -23,7 +21,7 @@ public class ValueTypeResolverTests
             IntProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, int>(x => x.IntProperty);
-        var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.Number);
+        var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.Number).Compile();
         
         func(dataset).Should().BeTrue();
     }
@@ -40,7 +38,7 @@ public class ValueTypeResolverTests
             IntProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, int>(x => x.IntProperty);
-        var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.Number);
+        var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.Number).Compile();
         
         func(dataset).Should().BeFalse();
     }
@@ -56,7 +54,7 @@ public class ValueTypeResolverTests
             IntProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, int>(x => x.IntProperty);
-        var func = sut.Resolve(QueryOperation.GreaterThan, queryValue, AnQLValueType.Number);
+        var func = sut.Resolve(QueryOperation.GreaterThan, queryValue, AnQLValueType.Number).Compile();
         
         func(dataset).Should().BeTrue();
     }
@@ -73,7 +71,7 @@ public class ValueTypeResolverTests
             IntProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, int>(x => x.IntProperty);
-        var func = sut.Resolve(QueryOperation.GreaterThan, queryValue, AnQLValueType.Number);
+        var func = sut.Resolve(QueryOperation.GreaterThan, queryValue, AnQLValueType.Number).Compile();
         
         func(dataset).Should().BeFalse();
     }
@@ -89,7 +87,7 @@ public class ValueTypeResolverTests
             IntProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, int>(x => x.IntProperty);
-        var func = sut.Resolve(QueryOperation.LessThan, queryValue, AnQLValueType.Number);
+        var func = sut.Resolve(QueryOperation.LessThan, queryValue, AnQLValueType.Number).Compile();
         
         func(dataset).Should().BeTrue();
     }
@@ -106,7 +104,7 @@ public class ValueTypeResolverTests
             IntProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, int>(x => x.IntProperty);
-        var func = sut.Resolve(QueryOperation.LessThan, queryValue, AnQLValueType.Number);
+        var func = sut.Resolve(QueryOperation.LessThan, queryValue, AnQLValueType.Number).Compile();
         
         func(dataset).Should().BeFalse();
     }
@@ -126,7 +124,7 @@ public class ValueTypeResolverTests
             StringProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, string>(x => x.StringProperty);
-        var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.String);
+        var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.String).Compile();
         
         func(dataset).Should().BeTrue();
     }
@@ -142,8 +140,8 @@ public class ValueTypeResolverTests
             StringProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, string>(x => x.StringProperty);
-        var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.String);
-        
+        var func = sut.Resolve(QueryOperation.Equal, queryValue, AnQLValueType.String).Compile();
+
         func(dataset).Should().BeFalse();
     }
     
@@ -158,7 +156,7 @@ public class ValueTypeResolverTests
             StringProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, string>(x => x.StringProperty);
-        var func = sut.Resolve(QueryOperation.GreaterThan, queryValue, AnQLValueType.String);
+        var func = sut.Resolve(QueryOperation.GreaterThan, queryValue, AnQLValueType.String).Compile();
         
         func(dataset).Should().BeTrue();
     }
@@ -175,7 +173,7 @@ public class ValueTypeResolverTests
             StringProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, string>(x => x.StringProperty);
-        var func = sut.Resolve(QueryOperation.GreaterThan, queryValue, AnQLValueType.String);
+        var func = sut.Resolve(QueryOperation.GreaterThan, queryValue, AnQLValueType.String).Compile();
         
         func(dataset).Should().BeFalse();
     }
@@ -191,7 +189,7 @@ public class ValueTypeResolverTests
             StringProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, string>(x => x.StringProperty);
-        var func = sut.Resolve(QueryOperation.LessThan, queryValue, AnQLValueType.String);
+        var func = sut.Resolve(QueryOperation.LessThan, queryValue, AnQLValueType.String).Compile();
         
         func(dataset).Should().BeTrue();
     }
@@ -208,7 +206,7 @@ public class ValueTypeResolverTests
             StringProperty = datasetValue
         };
         var sut = new ComparableTypeResolver<DemoClass, string>(x => x.StringProperty);
-        var func = sut.Resolve(QueryOperation.LessThan, queryValue, AnQLValueType.String);
+        var func = sut.Resolve(QueryOperation.LessThan, queryValue, AnQLValueType.String).Compile();
         
         func(dataset).Should().BeFalse();
     }
