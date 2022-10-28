@@ -8,9 +8,14 @@
 
   <p align="center">
     Another Query Language - simple, no nonsense querying for C#/ASP.NET/TypeScript 
-    <br />
-    <a href="https://codecov.io/github/twgraham/AnQL">
+  </p>
+
+  <p align="center">
+    <a href="https://github.com/twgraham/AnQL/actions/workflows/build-test.yaml">
         <img src="https://github.com/twgraham/AnQL/actions/workflows/build-test.yaml/badge.svg" />
+    </a>
+    <a href="https://github.com/twgraham/AnQL/actions/workflows/codeql.yaml">
+        <img src="https://github.com/twgraham/AnQL/actions/workflows/codeql.yaml/badge.svg" />
     </a>
     <a href="https://codecov.io/github/twgraham/AnQL" > 
         <img src="https://codecov.io/github/twgraham/AnQL/branch/master/graph/badge.svg?token=FUJXCID1YL"/> 
@@ -18,6 +23,7 @@
     <a href="https://codeclimate.com/github/twgraham/AnQL/maintainability">
       <img src="https://api.codeclimate.com/v1/badges/182f472df6db393c2bee/maintainability" />
     </a>
+  </p>
 </p>
 
 This project is still a work in progress.
@@ -42,7 +48,7 @@ public class Employee
   public string LastName { get; set; }
   public int Age { get; set; }
 
-  [Display(Name = "start_date")]
+  [AnQLProperty("start_date")]
   public DateTime CommencementDate { get; set; }
 }
 ```
