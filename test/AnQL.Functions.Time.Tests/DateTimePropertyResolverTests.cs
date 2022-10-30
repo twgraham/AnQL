@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AnQL.Core.Resolvers;
 using FluentAssertions;
 using Xunit;
@@ -51,6 +52,70 @@ public class DateTimePropertyResolverTests
         var func = sut.Resolve(QueryOperation.Equal, query, AnQLValueType.String);
         
         func(dataset).Should().BeTrue();
+    }
+
+    [Fact]
+    public void Resolve_GreaterThanDate()
+    {
+        const string query = "June 2023";
+        var dataset = new[]
+        {
+            new DemoClass { DateTimeProperty = new DateTime(2023, 6, 30) },
+            new DemoClass { DateTimeProperty = new DateTime(2023, 7, 2) }
+        };
+        var sut = new DateTimePropertyResolver<DemoClass>(x => x.DateTimeProperty);
+        var func = sut.Resolve(QueryOperation.GreaterThan, query, AnQLValueType.String);
+
+        dataset.Where(func).ToList().Should().HaveCount(1)
+            .And.Contain(dataset[1]);
+    }
+    
+    [Fact]
+    public void Resolve_LessThanDate()
+    {
+        const string query = "June 2023";
+        var dataset = new[]
+        {
+            new DemoClass { DateTimeProperty = new DateTime(2023, 5, 31) },
+            new DemoClass { DateTimeProperty = new DateTime(2023, 6, 2) }
+        };
+        var sut = new DateTimePropertyResolver<DemoClass>(x => x.DateTimeProperty);
+        var func = sut.Resolve(QueryOperation.LessThan, query, AnQLValueType.String);
+
+        dataset.Where(func).ToList().Should().HaveCount(1)
+            .And.Contain(dataset[0]);
+    }
+    
+    [Fact]
+    public void Resolve_GreaterThanExactDateTime()
+    {
+        const string query = "11AM on 3rd June 2023";
+        var dataset = new[]
+        {
+            new DemoClass { DateTimeProperty = new DateTime(2023, 6, 3, 8, 0, 0).ToUniversalTime() },
+            new DemoClass { DateTimeProperty = new DateTime(2023, 6, 3, 12, 0, 0).ToUniversalTime() }
+        };
+        var sut = new DateTimePropertyResolver<DemoClass>(x => x.DateTimeProperty);
+        var func = sut.Resolve(QueryOperation.GreaterThan, query, AnQLValueType.String);
+
+        dataset.Where(func).ToList().Should().HaveCount(1)
+            .And.Contain(dataset[1]);
+    }
+    
+    [Fact]
+    public void Resolve_LessThanExactDateTime()
+    {
+        const string query = "11AM on 3rd June 2023";
+        var dataset = new[]
+        {
+            new DemoClass { DateTimeProperty = new DateTime(2023, 6, 3, 8, 0, 0).ToUniversalTime() },
+            new DemoClass { DateTimeProperty = new DateTime(2023, 6, 3, 12, 0, 0).ToUniversalTime() }
+        };
+        var sut = new DateTimePropertyResolver<DemoClass>(x => x.DateTimeProperty);
+        var func = sut.Resolve(QueryOperation.LessThan, query, AnQLValueType.String);
+
+        dataset.Where(func).ToList().Should().HaveCount(1)
+            .And.Contain(dataset[0]);
     }
 
     [Theory]

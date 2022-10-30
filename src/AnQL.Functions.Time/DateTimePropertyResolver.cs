@@ -34,13 +34,13 @@ public class DateTimePropertyResolver<T> : IAnQLPropertyResolver<Func<T, bool>>
         if (!NaturalDateTime.TryConvert(value, _options.TimeZone, out var from, out var to))
             return AlwaysFalse;
 
-        if (to != null)
+        if (to.HasValue)
         {
             return op switch
             {
                 QueryOperation.Equal => BuildWithinRange(from.Value - Constants.OneTick, to.Value + Constants.OneTick),
-                QueryOperation.GreaterThan => BuildGreaterThan(from.Value),
-                QueryOperation.LessThan => BuildLessThan(to.Value),
+                QueryOperation.GreaterThan => BuildGreaterThan(to.Value),
+                QueryOperation.LessThan => BuildLessThan(from.Value),
                 _ => throw new ArgumentOutOfRangeException(nameof(op), op, null)
             };
         }
@@ -75,26 +75,28 @@ public class DateTimePropertyResolver<T> : IAnQLPropertyResolver<Func<T, bool>>
             TimeUnit.Second => (
                 new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second,
                     value.Offset),
-                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second + 1,
-                    value.Offset)),
+                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second,
+                    value.Offset).AddSeconds(1)
+            ),
             TimeUnit.Minute => (
                 new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0, value.Offset),
-                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute + 1, 0, value.Offset)),
+                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0, value.Offset).AddMinutes(1)
+            ),
             TimeUnit.Hour => (
                 new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, 0, 0, value.Offset),
-                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour + 1, 0, 0, value.Offset)
+                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, 0, 0, value.Offset).AddHours(1)
             ),
             TimeUnit.Day => (
                 new DateTimeOffset(value.Year, value.Month, value.Day, 0, 0, 0, value.Offset),
-                new DateTimeOffset(value.Year, value.Month, value.Day + 1, 0, 0, 0, value.Offset)
+                new DateTimeOffset(value.Year, value.Month, value.Day, 0, 0, 0, value.Offset).AddDays(1)
             ),
             TimeUnit.Month => (
                 new DateTimeOffset(value.Year, value.Month, 1, 0, 0, 0, value.Offset),
-                new DateTimeOffset(value.Year, value.Month + 1, 1, 0, 0, 0, value.Offset)
+                new DateTimeOffset(value.Year, value.Month, 1, 0, 0, 0, value.Offset).AddMonths(1)
             ),
             TimeUnit.Year => (
                 new DateTimeOffset(value.Year, 1, 1, 0, 0, 0, value.Offset),
-                new DateTimeOffset(value.Year + 1, 1, 1, 0, 0, 0, value.Offset)
+                new DateTimeOffset(value.Year, 1, 1, 0, 0, 0, value.Offset).AddYears(1)
             ),
             _ => throw new ArgumentOutOfRangeException(nameof(timeUnit), timeUnit, null)
         };
