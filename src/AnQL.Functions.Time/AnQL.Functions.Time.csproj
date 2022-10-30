@@ -10,10 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Recognizers.Text.DateTime" Version="1.8.5" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <ProjectReference Include="..\AnQL.Common.Time\AnQL.Common.Time.csproj" />
       <ProjectReference Include="..\AnQL.Core\AnQL.Core.csproj" />
     </ItemGroup>
 
