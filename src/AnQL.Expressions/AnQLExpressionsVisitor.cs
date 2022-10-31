@@ -35,12 +35,7 @@ public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<T, Expression<Func<T, b
     {
         return Expression.Lambda<Func<T, bool>>(Expression.Not(childExpression.Body), childExpression.Parameters);
     }
-
-    public override Expression<Func<T, bool>> VisitParens(AnQLGrammarParser.ParensContext context)
-    {
-        return Visit(context.expr());
-    }
-
+    
     public override Expression<Func<T, bool>> VisitAnyEqual(params Expression<Func<T, bool>>[] childExpressions)
     {
         return childExpressions.Aggregate((agg, curr) => agg.CombineExpression(curr, Expression.OrElse));
