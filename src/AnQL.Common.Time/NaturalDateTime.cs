@@ -32,12 +32,12 @@ public class NaturalDateTime
 
                 if (from > to)
                     (from, to) = (to, from);
-
-                return true;
             }
-
-            from = TimeZoneInfo.ConvertTime(
-                DateTimeOffset.Parse(resolutionValues[0]["value"], CultureInfo.InvariantCulture), timeZoneInfo);
+            else
+            {
+                from = TimeZoneInfo.ConvertTime(
+                    DateTimeOffset.Parse(resolutionValues[0]["value"], CultureInfo.InvariantCulture), timeZoneInfo);
+            }
 
             return true;
         }
