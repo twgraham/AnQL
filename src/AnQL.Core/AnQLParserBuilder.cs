@@ -28,17 +28,10 @@ public abstract class AnQLParserBuilder<TReturn, TItem> : IAnQLParserBuilder<TRe
 
     public IAnQLParserBuilder<TReturn, TItem> RegisterAllProperties()
     {
-        var parameter = Expression.Parameter(typeof(TItem), "x");
         foreach (var property in typeof(TItem).GetProperties())
         {
-            var conv = Expression.Convert(Expression.Property(parameter, property), typeof(object));
-            var exp = Expression.Lambda<Func<TItem, object>>(conv, parameter);
             var anqlPropertyAttribute = property.GetCustomAttribute<AnQLPropertyAttribute>();
-            
-            if (anqlPropertyAttribute?.Name != null)
-                WithProperty(anqlPropertyAttribute.Name, exp);
-
-            WithProperty(exp);
+            RegisterProperty(anqlPropertyAttribute?.Name, property);
         }
 
         return this;
@@ -46,20 +39,25 @@ public abstract class AnQLParserBuilder<TReturn, TItem> : IAnQLParserBuilder<TRe
 
     public IAnQLParserBuilder<TReturn, TItem> RegisterTaggedProperties()
     {
-        var parameter = Expression.Parameter(typeof(TItem), "x");
         foreach (var property in typeof(TItem).GetProperties())
         {
             var anqlPropertyAttribute = property.GetCustomAttribute<AnQLPropertyAttribute>();
-
-            if (anqlPropertyAttribute == null)
-                continue;
-            
-            var conv = Expression.Convert(Expression.Property(parameter, property), typeof(object));
-            var exp = Expression.Lambda<Func<TItem, object>>(conv, parameter); 
-            WithProperty(anqlPropertyAttribute.Name, exp);
+            if (anqlPropertyAttribute != null)
+                RegisterProperty(anqlPropertyAttribute.Name, property);
         }
 
         return this;
+    }
+
+    private void RegisterProperty(string? name, PropertyInfo propertyInfo)
+    {
+        var parameter = Expression.Parameter(typeof(TItem), "x");
+        var conv = Expression.Convert(Expression.Property(parameter, propertyInfo), typeof(object));
+        var exp = Expression.Lambda<Func<TItem, object>>(conv, parameter);
+        if (name != null)
+            WithProperty(name, exp);
+        else
+            WithProperty(exp);
     }
 
     public IAnQLParserBuilder<TReturn, TItem> WithProperty(Expression<Func<TItem, object>> propertyPath)

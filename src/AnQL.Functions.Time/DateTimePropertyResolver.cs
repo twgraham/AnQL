@@ -45,7 +45,7 @@ public class DateTimePropertyResolver<T> : IAnQLPropertyResolver<Func<T, bool>>
             };
         }
         
-        var (min, max) = ClampDate(from.Value, _options.ClampExactEqualsUnit);
+        var (min, max) = NaturalDateTime.ClampDate(from.Value, _options.ClampExactEqualsUnit);
 
         return op switch
         {
@@ -67,46 +67,6 @@ public class DateTimePropertyResolver<T> : IAnQLPropertyResolver<Func<T, bool>>
     private Func<T, bool> BuildGreaterThan(DateTimeOffset value) => arg => _propertyAccessor(arg) > value;
 
     private Func<T, bool> BuildLessThan(DateTimeOffset value) => arg => _propertyAccessor(arg) < value;
-
-    private static (DateTimeOffset Min, DateTimeOffset Max) ClampDate(DateTimeOffset value, TimeUnit timeUnit)
-    {
-        return timeUnit switch
-        {
-            TimeUnit.Second => (
-                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second,
-                    value.Offset),
-                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second,
-                    value.Offset).AddSeconds(1)
-            ),
-            TimeUnit.Minute => (
-                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0, value.Offset),
-                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0, value.Offset).AddMinutes(1)
-            ),
-            TimeUnit.Hour => (
-                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, 0, 0, value.Offset),
-                new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, 0, 0, value.Offset).AddHours(1)
-            ),
-            TimeUnit.Day => (
-                new DateTimeOffset(value.Year, value.Month, value.Day, 0, 0, 0, value.Offset),
-                new DateTimeOffset(value.Year, value.Month, value.Day, 0, 0, 0, value.Offset).AddDays(1)
-            ),
-            TimeUnit.Month => (
-                new DateTimeOffset(value.Year, value.Month, 1, 0, 0, 0, value.Offset),
-                new DateTimeOffset(value.Year, value.Month, 1, 0, 0, 0, value.Offset).AddMonths(1)
-            ),
-            TimeUnit.Year => (
-                new DateTimeOffset(value.Year, 1, 1, 0, 0, 0, value.Offset),
-                new DateTimeOffset(value.Year, 1, 1, 0, 0, 0, value.Offset).AddYears(1)
-            ),
-            _ => throw new ArgumentOutOfRangeException(nameof(timeUnit), timeUnit, null)
-        };
-    }
-    
-    private static Func<T, DateTimeOffset> CachedAccessor(Func<T, DateTimeOffset> accessor)
-    {
-        DateTimeOffset? cache = null;
-        return arg => cache ??= accessor(arg);
-    }
 
     private static Func<T, DateTimeOffset> ToDateTimeOffsetFunc(Func<T, DateTime> func)
         => arg => new DateTimeOffset(func(arg));
@@ -131,16 +91,6 @@ public class DateTimePropertyResolver<T> : IAnQLPropertyResolver<Func<T, bool>>
                                              BindingFlags.OptionalParamBinding, null, new object?[] { path.Compile(), null }, null);
             return (DateTimePropertyResolver<T>)resolver;
         }
-    }
-    
-    public enum TimeUnit
-    {
-        Second,
-        Minute,
-        Hour,
-        Day,
-        Month,
-        Year
     }
 
     public class Options

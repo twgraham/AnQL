@@ -61,4 +61,82 @@ public class NaturalDateTimeTests
         from.Should().BeNull();
         to.Should().BeNull();
     }
+    
+    [Fact]
+    public void ClampDate_Second_ShouldSetMinMaxToSecond()
+    {
+        var value = new DateTimeOffset(2023, 6, 11, 5, 32, 22, 103, TimeSpan.Zero);
+        var expectedMin = new DateTimeOffset(2023, 6, 11, 5, 32, 22, 0, TimeSpan.Zero);
+        var expectedMax = new DateTimeOffset(2023, 6, 11, 5, 32, 23, 0, TimeSpan.Zero);
+        
+        var (min, max) = NaturalDateTime.ClampDate(value, TimeUnit.Second);
+
+        min.Should().Be(expectedMin);
+        max.Should().Be(expectedMax);
+    }
+    
+    [Fact]
+    public void ClampDate_Minute_ShouldSetMinMaxToMinute()
+    {
+        var value = new DateTimeOffset(2023, 6, 11, 5, 32, 22, TimeSpan.Zero);
+        var expectedMin = new DateTimeOffset(2023, 6, 11, 5, 32, 0, TimeSpan.Zero);
+        var expectedMax = new DateTimeOffset(2023, 6, 11, 5, 33, 0, TimeSpan.Zero);
+        
+        var (min, max) = NaturalDateTime.ClampDate(value, TimeUnit.Minute);
+
+        min.Should().Be(expectedMin);
+        max.Should().Be(expectedMax);
+    }
+    
+    [Fact]
+    public void ClampDate_Hour_ShouldSetMinMaxToHour()
+    {
+        var value = new DateTimeOffset(2023, 6, 11, 5, 32, 0, TimeSpan.Zero);
+        var expectedMin = new DateTimeOffset(2023, 6, 11, 5, 0, 0, TimeSpan.Zero);
+        var expectedMax = new DateTimeOffset(2023, 6, 11, 6, 0, 0, TimeSpan.Zero);
+        
+        var (min, max) = NaturalDateTime.ClampDate(value, TimeUnit.Hour);
+
+        min.Should().Be(expectedMin);
+        max.Should().Be(expectedMax);
+    }
+    
+    [Fact]
+    public void ClampDate_Day_ShouldSetMinMaxToDay()
+    {
+        var value = new DateTimeOffset(2023, 6, 11, 5, 0, 0, TimeSpan.Zero);
+        var expectedMin = new DateTimeOffset(2023, 6, 11, 0, 0, 0, TimeSpan.Zero);
+        var expectedMax = new DateTimeOffset(2023, 6, 12, 0, 0, 0, TimeSpan.Zero);
+        
+        var (min, max) = NaturalDateTime.ClampDate(value, TimeUnit.Day);
+
+        min.Should().Be(expectedMin);
+        max.Should().Be(expectedMax);
+    }
+    
+    [Fact]
+    public void ClampDate_Month_ShouldSetMinMaxToMonth()
+    {
+        var value = new DateTimeOffset(2023, 6, 11, 0, 0, 0, TimeSpan.Zero);
+        var expectedMin = new DateTimeOffset(2023, 6, 1, 0, 0, 0, TimeSpan.Zero);
+        var expectedMax = new DateTimeOffset(2023, 7, 1, 0, 0, 0, TimeSpan.Zero);
+        
+        var (min, max) = NaturalDateTime.ClampDate(value, TimeUnit.Month);
+
+        min.Should().Be(expectedMin);
+        max.Should().Be(expectedMax);
+    }
+    
+    [Fact]
+    public void ClampDate_Year_ShouldSetMinMaxToYear()
+    {
+        var value = new DateTimeOffset(2023, 6, 1, 0, 0, 0, TimeSpan.Zero);
+        var expectedMin = new DateTimeOffset(2023, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        var expectedMax = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
+        
+        var (min, max) = NaturalDateTime.ClampDate(value, TimeUnit.Year);
+
+        min.Should().Be(expectedMin);
+        max.Should().Be(expectedMax);
+    }
 }
