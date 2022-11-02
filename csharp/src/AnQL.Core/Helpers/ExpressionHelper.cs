@@ -12,7 +12,7 @@ public static class ExpressionHelper
 
         var sourceType = typeof(T);
         
-        if (sourceType != propInfo.ReflectedType && !sourceType.IsSubclassOf(propInfo.ReflectedType))
+        if (propInfo.ReflectedType != null && sourceType != propInfo.ReflectedType && !sourceType.IsSubclassOf(propInfo.ReflectedType))
             throw new ArgumentException($"Expression '{expression}' refers to a property that is not from type {sourceType}.");
 
         var displayAttribute = propInfo.GetCustomAttribute<DisplayAttribute>();

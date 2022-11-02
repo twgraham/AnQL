@@ -16,7 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Antlr4 Include="Grammar/AnQLGrammar.g4">
+        <Antlr4 Include="../../../grammar/AnQLGrammar.g4">
             <Listener>false</Listener>
             <Visitor>true</Visitor>
             <Package>AnQL.Core.Grammar</Package>
