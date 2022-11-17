@@ -1,0 +1,22 @@
+{
+    "name": "@anql/functions",
+    "description": "",
+    "main": "index.ts",
+    "scripts": {
+      "test": "test"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/twgraham/AnQL.git"
+    },
+    "author": "Taylor Graham",
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/twgraham/AnQL/issues"
+    },
+    "homepage": "https://github.com/twgraham/AnQL#readme",
+    "dependencies": {
+      "@anql/core": "*"
+    }
+  }
+  

@@ -1,0 +1,25 @@
+{
+    "name": "anql",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/twgraham/AnQL.git"
+    },
+    "author": "Taylor Graham",
+    "license": "MIT",
+    "homepage": "https://github.com/twgraham/AnQL#readme",
+    "bugs": {
+        "url": "https://github.com/twgraham/AnQL/issues"
+    },
+    "workspaces": [
+        "core",
+        "functions"
+    ],
+    "scripts": {
+        "clean": "tsc --build --clean",
+        "build": "tsc --build",
+        "watch": "tsc --build --watch"
+    },
+    "devDependencies": {
+        "typescript": "4.9.3"
+    }
+}

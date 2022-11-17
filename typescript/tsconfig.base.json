@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "sourceMap": true,
+        "target": "es2020",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "isolatedModules": true,
+        "esModuleInterop": true,
+        "declaration": true,
+        "allowSyntheticDefaultImports": true,
+        "incremental": true,
+        "strict": true,
+        "composite": true,
+        "paths": {
+            "@src/*": ["src/*"],
+            "@gen/*": ["src/gen/*"],
+            "@test/*": ["test/*"]
+        }
+    }
+}

@@ -1,0 +1,1 @@
+export type Func<TArg, TReturn> = (value: TArg) => TReturn

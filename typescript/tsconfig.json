@@ -1,0 +1,7 @@
+{
+    "references": [
+        { "path": "core" },
+        { "path": "functions" }
+    ],
+    "files": []
+}
