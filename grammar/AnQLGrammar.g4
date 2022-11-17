@@ -1,26 +1,42 @@
 grammar AnQLGrammar;
 
-options { caseInsensitive=true; }
+// Entrypoint
+query: expr;
 
-AND:            'and' | '&';
-OR:             'or';
-NOT:            'not' | '!';
-BOOLEAN:        'true' | 'false';
-NULL:           'null';
-NUMBER:         '-'? Int ('.' Int)?;
-WORD:           AlphaNum+;
-STOPWORD:       '-' + WORD;
-QUOTE:          SingleQuote | DoubleQuote;
-WHITESPACES:    (Whitespace | NewLine)+ -> channel(HIDDEN);
+expr
+	: '(' expr ')'							# Parens
+	| Not expr                      		# Not
+    | (Quote | Stopword | Word)+            # FreeText
+	| propertyPath ':' '>' value           	# GreaterThan
+    | propertyPath ':' '<' value           	# LessThan
+    | propertyPath ':' value               	# Equal
+    | propertyPath ':' value (',' value)+  	# AnyEqual
+    | left=expr And right=expr				# And
+    | left=expr Or* right=expr				# Or
+    ;
 
-DOT:            '.';
-COLON:          ':';
-OPEN_PARENS:    '(';
-CLOSE_PARENS:   ')';
-LT:             '<';
-GT:             '>';
-COMMA:          ',';
-UNDERSCORE:     '_';
+propertyPath : property ('.' property)* ;
+
+property: Identifier;
+
+value : Null			# Null
+      | Boolean			# Bool
+      | Number			# Number
+      | (Word | Quote)	# String
+      ;
+
+// Lexer
+And:            A N D | '&&';
+Or:             O R | '||';
+Not:            N O T | '!';
+Boolean:        'true' | 'false';
+Null:           N U L L;
+Number:         '-'? Int ('.' Int)?;
+Word:           AlphaNum+;
+Stopword:       '-' + Word;
+Quote:          SingleQuote | DoubleQuote;
+Identifier:		([a-zA-Z_] [a-zA-Z_0-9]*) | Word;
+Whitespaces:    (Whitespace | NewLine)+ -> channel(HIDDEN);
 
 // Fragments
 
@@ -65,32 +81,29 @@ fragment UnicodeClassZS
 	| '\u205F' // MEDIUM MATHEMATICAL SPACE
 	;
 
-// Entrypoint
-query: expr;
-
-expr: NOT expr                      # NOT
-    | expr AND expr                 # ExprAND
-    | expr OR* expr                 # ExprOR
-    | (text | keyOpValue)           # TextOrFilter
-    | '(' expr ')'                  # Parens
-    ;
-
-text: (QUOTE | STOPWORD | WORD)+;
-
-property_path : property ('.' property)* ;
-
-keyOpValue  : property_path ':' '>' value                  # GreaterThan
-            | property_path ':' '<' value                  # LessThan
-            | property_path ':' value                      # Equal
-            | property_path ':' value (',' value)+         # AnyEqual
-            ;
-
-property: (WORD ('_' WORD)* | reserved_word);
-
-reserved_word: NULL | BOOLEAN;
-
-value : NULL                        # null
-      | BOOLEAN                     # bool
-      | NUMBER                      # number
-      | (QUOTE | WORD)              # string
-      ;
+fragment A : [aA];
+fragment B : [bB];
+fragment C : [cC];
+fragment D : [dD];
+fragment E : [eE];
+fragment F : [fF];
+fragment G : [gG];
+fragment H : [hH];
+fragment I : [iI];
+fragment J : [jJ];
+fragment K : [kK];
+fragment L : [lL];
+fragment M : [mM];
+fragment N : [nN];
+fragment O : [oO];
+fragment P : [pP];
+fragment Q : [qQ];
+fragment R : [rR];
+fragment S : [sS];
+fragment T : [tT];
+fragment U : [uU];
+fragment V : [vV];
+fragment W : [wW];
+fragment X : [xX];
+fragment Y : [yY];
+fragment Z : [zZ];

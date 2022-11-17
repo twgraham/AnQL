@@ -16,10 +16,12 @@ public abstract class AnQLBaseVisitor<TModel, TReturn> : AnQLGrammarBaseVisitor<
         Options = options;
     }
     
-    public abstract TReturn VisitExprAND(TReturn left, TReturn right);
-    public abstract TReturn VisitExprOR(TReturn left, TReturn right);
-    public abstract TReturn VisitExprNOT(TReturn childExpression);
-    public abstract TReturn VisitAnyEqual(params TReturn[] childExpressions);
+    public abstract TReturn VisitAnd(TReturn left, TReturn right);
+    public abstract TReturn VisitOr(TReturn left, TReturn right);
+    public abstract TReturn VisitNot(TReturn childExpression);
+
+    public virtual TReturn VisitAnyEqual(params TReturn[] childExpressions)
+        => childExpressions.Aggregate(VisitOr);
 
     public override TReturn VisitQuery(AnQLGrammarParser.QueryContext context)
     {
@@ -36,19 +38,19 @@ public abstract class AnQLBaseVisitor<TModel, TReturn> : AnQLGrammarBaseVisitor<
         return FailedQueryResult;
     }
 
-    public override TReturn VisitExprAND(AnQLGrammarParser.ExprANDContext context)
+    public override TReturn VisitAnd(AnQLGrammarParser.AndContext context)
     {
-        return VisitExprAND(Visit(context.expr(0)), Visit(context.expr(1)));
+        return VisitAnd(Visit(context.left), Visit(context.right));
     }
     
-    public override TReturn VisitExprOR(AnQLGrammarParser.ExprORContext context)
+    public override TReturn VisitOr(AnQLGrammarParser.OrContext context)
     {
-        return VisitExprOR(Visit(context.expr(0)), Visit(context.expr(1)));
+        return VisitOr(Visit(context.left), Visit(context.right));
     }
 
-    public override TReturn VisitNOT(AnQLGrammarParser.NOTContext context)
+    public override TReturn VisitNot(AnQLGrammarParser.NotContext context)
     {
-        return VisitExprNOT(Visit(context.expr()));
+        return VisitNot(Visit(context.expr()));
     }
 
     public override TReturn VisitParens(AnQLGrammarParser.ParensContext context)
@@ -58,30 +60,30 @@ public abstract class AnQLBaseVisitor<TModel, TReturn> : AnQLGrammarBaseVisitor<
 
     public override TReturn VisitEqual(AnQLGrammarParser.EqualContext context)
     {
-        return BuildFilter(QueryOperation.Equal, context.property_path(), context.value());
+        return BuildFilter(QueryOperation.Equal, context.propertyPath(), context.value());
     }
 
     public override TReturn VisitGreaterThan(AnQLGrammarParser.GreaterThanContext context)
     {
-        return BuildFilter(QueryOperation.GreaterThan, context.property_path(), context.value());
+        return BuildFilter(QueryOperation.GreaterThan, context.propertyPath(), context.value());
     }
 
     public override TReturn VisitLessThan(AnQLGrammarParser.LessThanContext context)
     {
-        return BuildFilter(QueryOperation.LessThan, context.property_path(), context.value());
+        return BuildFilter(QueryOperation.LessThan, context.propertyPath(), context.value());
     }
     
     public override TReturn VisitAnyEqual(AnQLGrammarParser.AnyEqualContext context)
     {
         return VisitAnyEqual(context.value()
-            .Select(valueContext => BuildFilter(QueryOperation.Equal, context.property_path(), valueContext))
+            .Select(valueContext => BuildFilter(QueryOperation.Equal, context.propertyPath(), valueContext))
             .ToArray());
     }
 
     protected virtual TReturn TransformFilter(TReturn filterExpression) => filterExpression;
 
     private TReturn BuildFilter(QueryOperation operation,
-        AnQLGrammarParser.Property_pathContext propertyPathContext, AnQLGrammarParser.ValueContext valueContext)
+        AnQLGrammarParser.PropertyPathContext propertyPathContext, AnQLGrammarParser.ValueContext valueContext)
     {
         if (!ResolverMap.TryGet(propertyPathContext.GetText(), out var resolver))
             return HandleUnknownProperty(propertyPathContext);
@@ -91,7 +93,7 @@ public abstract class AnQLBaseVisitor<TModel, TReturn> : AnQLGrammarBaseVisitor<
         return TransformFilter(resolver.Resolve(operation, value, type));
     }
 
-    protected TReturn HandleUnknownProperty(AnQLGrammarParser.Property_pathContext propertyPathContext)
+    protected TReturn HandleUnknownProperty(AnQLGrammarParser.PropertyPathContext propertyPathContext)
     {
         if (Options.UnknownPropertyBehaviour is UnknownPropertyBehaviour.Throw or UnknownPropertyBehaviour.Fail)
             throw new UnknownPropertyException(propertyPathContext.GetText());
@@ -105,11 +107,11 @@ public abstract class AnQLBaseVisitor<TModel, TReturn> : AnQLGrammarBaseVisitor<
         {
             switch (currentContext)
             {
-                case AnQLGrammarParser.ExprANDContext:
+                case AnQLGrammarParser.AndContext:
                     return notSwitch ? FailedQueryResult : SuccessQueryResult;
-                case AnQLGrammarParser.ExprORContext:
+                case AnQLGrammarParser.OrContext:
                     return notSwitch ? SuccessQueryResult : FailedQueryResult;
-                case AnQLGrammarParser.NOTContext:
+                case AnQLGrammarParser.NotContext:
                     notSwitch = !notSwitch;
                     break;
             }

@@ -16,15 +16,12 @@ public class AnQLFunctionsVisitor<T> : AnQLBaseVisitor<T, Func<T, bool>>
     {
     }
     
-    public override Func<T, bool> VisitExprAND(Func<T, bool> left, Func<T, bool> right) =>
+    public override Func<T, bool> VisitAnd(Func<T, bool> left, Func<T, bool> right) =>
         value => left(value) && right(value);
 
-    public override Func<T, bool> VisitExprOR(Func<T, bool> left, Func<T, bool> right) =>
+    public override Func<T, bool> VisitOr(Func<T, bool> left, Func<T, bool> right) =>
         value => left(value) || right(value);
 
-    public override Func<T, bool> VisitExprNOT(Func<T, bool> childExpression) =>
+    public override Func<T, bool> VisitNot(Func<T, bool> childExpression) =>
         value => !childExpression(value);
-
-    public override Func<T, bool> VisitAnyEqual(params Func<T, bool>[] childExpressions) =>
-        childExpressions.Aggregate((left, right) => value => left(value) || right(value));
 }

@@ -13,7 +13,7 @@ public static class AnQLGrammarParserExtensions
             AnQLGrammarParser.NullContext => (value, AnQLValueType.Null),
             AnQLGrammarParser.BoolContext => (value, AnQLValueType.Bool),
             AnQLGrammarParser.NumberContext => (value, AnQLValueType.Number),
-            AnQLGrammarParser.StringContext s => (s.GetToken(AnQLGrammarLexer.QUOTE, 0) != null ? value[1..^1] : value, AnQLValueType.String),
+            AnQLGrammarParser.StringContext s => (s.GetToken(AnQLGrammarLexer.Quote, 0) != null ? value[1..^1] : value, AnQLValueType.String),
             _ => throw new ArgumentOutOfRangeException(nameof(valueContext))
         };
     }

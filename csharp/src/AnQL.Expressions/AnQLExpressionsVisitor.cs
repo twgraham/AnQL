@@ -21,24 +21,19 @@ public class AnQLExpressionsVisitor<T> : AnQLBaseVisitor<T, Expression<Func<T, b
     {
     }
     
-    public override Expression<Func<T, bool>> VisitExprAND(Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
+    public override Expression<Func<T, bool>> VisitAnd(Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
     {
         return left.Update(Expression.AndAlso(left.Body, right.Body), new []{Parameter});
     }
 
-    public override Expression<Func<T, bool>> VisitExprOR(Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
+    public override Expression<Func<T, bool>> VisitOr(Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
     {
         return left.Update(Expression.OrElse(left.Body, right.Body), new []{Parameter});
     }
 
-    public override Expression<Func<T, bool>> VisitExprNOT(Expression<Func<T, bool>> childExpression)
+    public override Expression<Func<T, bool>> VisitNot(Expression<Func<T, bool>> childExpression)
     {
         return Expression.Lambda<Func<T, bool>>(Expression.Not(childExpression.Body), childExpression.Parameters);
-    }
-    
-    public override Expression<Func<T, bool>> VisitAnyEqual(params Expression<Func<T, bool>>[] childExpressions)
-    {
-        return childExpressions.Aggregate((agg, curr) => agg.CombineExpression(curr, Expression.OrElse));
     }
 
     protected override Expression<Func<T, bool>> TransformFilter(Expression<Func<T, bool>> filterExpression)

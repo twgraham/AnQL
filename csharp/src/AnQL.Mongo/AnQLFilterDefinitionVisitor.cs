@@ -14,13 +14,13 @@ public class AnQLFilterDefinitionVisitor<T> : AnQLBaseVisitor<T, FilterDefinitio
     {
     }
 
-    public override FilterDefinition<T> VisitExprAND(FilterDefinition<T> left, FilterDefinition<T> right)
+    public override FilterDefinition<T> VisitAnd(FilterDefinition<T> left, FilterDefinition<T> right)
         => left & right;
 
-    public override FilterDefinition<T> VisitExprOR(FilterDefinition<T> left, FilterDefinition<T> right)
+    public override FilterDefinition<T> VisitOr(FilterDefinition<T> left, FilterDefinition<T> right)
         => left | right;
 
-    public override FilterDefinition<T> VisitExprNOT(FilterDefinition<T> childExpression)
+    public override FilterDefinition<T> VisitNot(FilterDefinition<T> childExpression)
         => !childExpression;
 
     public override FilterDefinition<T> VisitAnyEqual(params FilterDefinition<T>[] childExpressions)
